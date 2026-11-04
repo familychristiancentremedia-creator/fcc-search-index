@@ -1,0 +1,25 @@
+HTTP/1.1 200 OK
+Date: Wed, 04 Nov 2026 16:10:09 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+CF-Ray: a554e32368a6c533-YYC
+CF-Cache-Status: HIT
+Age: 2856
+Cache-Control: public,max-age=0,must-revalidate
+x-seen-by: bQAXdg/f3pWGCb3VI6q72A==,
+Content-Language: en
+ETag: W/"4b31adcc747a6e59345707eb90238229"
+Link: <https://static.parastorage.com/>; rel=preconnect; crossorigin, <https://static.parastorage.com/>; rel=preconnect, <https://static.wixstatic.com/>; rel=preconnect; crossorigin, <https://static.wixstatic.com/>; rel=preconnect, <https://siteassets.parastorage.com>; rel=preconnect; crossorigin
+Server: cloudflare
+x-wix-request-id: 1793808609.832296125772738530
+Strict-Transport-Security: max-age=31556952
+Vary: Accept-Encoding
+server-timing: cache;desc=miss, varnish;desc=miss_hit, dc;desc=cloudflare
+x-content-type-options: nosniff
+x-served-by: YYC
+Set-Cookie: ssr-caching=cache#desc=miss#varnish=miss_hit#dc#desc=cloudflare; Max-Age=20
+set-cookie: sec-fetch-unsupported=1; Path=/; Secure; SameSite=Lax;
+set-cookie: __cf_bm=wVwgDfe4L0hk4hmKd6bicA69oczN9vozk1TG8GUJ0NY-1793808609.8245213-1.0.1.1-drIRm8P.pTdEhPcCIQc1w9ANjoRJKBckzENE2n.xfjVaBbyClUJvVNTxNuAEN0cYXS3i2RRYHSigjZMvwy_e0ER6itnXrMB7QakhQKKFCwy4c5KEQwnCTWuEuB.Po9Et; HttpOnly; SameSite=None; Secure; Path=/; Domain=www.familychristiancentre.org; Expires=Wed, 04 Nov 2026 16:40:09 GMT
+alt-svc: h3=":443"; ma=86400
+

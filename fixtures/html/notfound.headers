@@ -1,0 +1,21 @@
+HTTP/1.1 404 Not Found
+Date: Wed, 04 Nov 2026 16:10:12 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+CF-Ray: a554e330984801d4-YYC
+CF-Cache-Status: MISS
+Cache-Control: public,max-age=0,must-revalidate
+Set-Cookie: ssr-caching=cache#desc=miss#varnish=miss_miss#dc#desc=cloudflare_sea1; max-age=20
+set-cookie: __cf_bm=wutb5stTLUqo6CdEvyJk8bb0Af_hir8L36TcPkvwoqU-1793808611.932405-1.0.1.1-nfrl4kJk.ngRnv_tIPQVVYb41N3e4oYyzXzcv_PW9V7.8e5f8k.aUVkef9QriFBOJxHs_adRgRJiSyFE7NrUnuEBHyKTWshTWsjJxFRhMa_IOzcQmoRY6g3UVkNmXSFw; HttpOnly; SameSite=None; Secure; Path=/; Domain=www.familychristiancentre.org; Expires=Wed, 04 Nov 2026 16:40:12 GMT
+Content-Language: en
+Server: cloudflare
+x-wix-request-id: 1793808611.96354315131489
+Strict-Transport-Security: max-age=31556952
+Vary: Accept-Encoding
+server-timing: cache;desc=miss, varnish;desc=miss_miss, dc;desc=cloudflare_sea1
+x-content-type-options: nosniff
+x-seen-by: bQAXdg/f3pWGCb3VI6q72A==,bQAXdg/f3pWGCb3VI6q72A==,ui2Pjuc3zC1HEw7V2qXeyh9slopJdhD+WySraMrpIY8=,ui2Pjuc3zC1HEw7V2qXeyh9slopJdhD+WySraMrpIY8=,Ua1iSBCTq7qSXjmRCGE1NyltiS9861YLBJVYHHDsKeyXtlDuyMVqBr82/g/r+JKuiEjJ19gJ6UUN+Su9S15jeKvk1vhD5KP4kt6zbAstSCQ=,2d58ifebGbosy5xc+FRalu4MEDkklFUljP3bi/zWZTAfTyIXShm9yFZGPDaYXQS7H5CahN25DLfTcoHDYg14jQ==,2UNV7KOq4oGjA5+PKsX47HqjR+6CNmn/ng3r7CWVjR4=,2UNV7KOq4oGjA5+PKsX47EzpsDHuH75rNqOhkG1qhKU=,R8nVwPJv9QJL1m78OROO+Fdis/npfEIahviSgXqIhwQ=,adCcrjWN+9jYhIHsscsS5sCxPXt77pQvXeQh5HrVZZ0SO5XmrrCSQNDehIjmfew3MIzI2CRcTWLPtTCFQ/A3ZA==
+x-served-by: YYC
+alt-svc: h3=":443"; ma=86400
+

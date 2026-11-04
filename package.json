@@ -1,0 +1,14 @@
+{
+  "name": "fcc-search-index",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Automated full-site search index builder for familychristiancentre.org (Concept 6 route A). Phase 1: discovery, mapping, extraction, reconciliation, build, validation, report. No publishing.",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "dry-run": "node src/index.mjs --dry-run",
+    "fixtures": "node src/index.mjs --from-fixtures fixtures --out out/fixtures"
+  },
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,68 @@
+{
+  "_note": "Recorded 2026-11-04 from the Wix Data Items API (query) for the public content collections, read-only. Text fields are abbreviated; `_updatedDate`/`_createdDate` kept as the API returns them. Only collections with read permission ANYONE and content relevance are listed; the 87 form/member/marketing collections are intentionally absent.",
+  "collections": {
+    "OurBeliefs": {
+      "permissions": {"read": "ANYONE"},
+      "linkFields": {"item": "link-our-beliefs-beliefTitle", "list": "link-our-beliefs-all"},
+      "titleField": "beliefTitle",
+      "textFields": ["beliefDescription", "referenceScripture"],
+      "total": 9,
+      "items": [
+        {"_id": "328c48c5-262d-45da-8574-6f7ace10e140", "beliefTitle": "ON THE SECOND COMING", "link-our-beliefs-beliefTitle": "/our-beliefs/on-the-second-coming", "link-our-beliefs-all": "/our-beliefs/", "beliefDescription": "We believe in the personal, visible return of Jesus Christ.", "referenceScripture": "Acts 1:11; 1 Thessalonians 4:16-17", "isCoreBelief": true, "_updatedDate": {"$date": "2026-04-14T18:02:11.000Z"}, "_createdDate": {"$date": "2024-09-18T20:10:00.000Z"}},
+        {"_id": "154984c5-a3e7-465b-882a-73146230ca19", "beliefTitle": "ON DIVINE HEALING", "link-our-beliefs-beliefTitle": "/our-beliefs/on-divine-healing", "link-our-beliefs-all": "/our-beliefs/", "beliefDescription": "We believe that healing for the whole person is provided in the atonement.", "referenceScripture": "Isaiah 53:4-5; James 5:14-16", "isCoreBelief": true, "_updatedDate": {"$date": "2026-04-14T18:02:11.000Z"}, "_createdDate": {"$date": "2024-09-18T20:10:00.000Z"}},
+        {"_id": "557564ab-8e46-4fc2-99e6-598795708d61", "beliefTitle": "ON JESUS CHRIST", "link-our-beliefs-beliefTitle": "/our-beliefs/on-jesus-christ", "link-our-beliefs-all": "/our-beliefs/", "beliefDescription": "We believe that Jesus Christ is the eternal Son of God.", "referenceScripture": "John 1:1-14; Colossians 1:15-20", "isCoreBelief": true, "_updatedDate": {"$date": "2026-04-14T18:02:11.000Z"}, "_createdDate": {"$date": "2024-09-18T20:10:00.000Z"}},
+        {"_id": "05e4ad23-d19c-4e5c-a9d3-d03dcc2a0638", "beliefTitle": "ON THE SCRIPTURES", "link-our-beliefs-beliefTitle": "/our-beliefs/on-the-scriptures", "link-our-beliefs-all": "/our-beliefs/", "beliefDescription": "We believe the Bible is the inspired Word of God.", "referenceScripture": "2 Timothy 3:16-17", "isCoreBelief": true, "_updatedDate": {"$date": "2026-04-14T18:02:11.000Z"}, "_createdDate": {"$date": "2024-09-18T20:10:00.000Z"}},
+        {"_id": "5305420b-456a-41d0-a7d8-e71a3808d585", "beliefTitle": "ON WATER BAPTISM", "link-our-beliefs-beliefTitle": "/our-beliefs/on-water-baptism", "link-our-beliefs-all": "/our-beliefs/", "beliefDescription": "We believe in water baptism by immersion for believers.", "referenceScripture": "Matthew 28:19; Romans 6:3-4", "isCoreBelief": true, "_updatedDate": {"$date": "2026-04-14T18:02:11.000Z"}, "_createdDate": {"$date": "2024-09-18T20:10:00.000Z"}},
+        {"_id": "af9de090-0fd7-4737-865e-84019c59bd21", "beliefTitle": "ON THE HOLY SPIRIT", "link-our-beliefs-beliefTitle": "/our-beliefs/on-the-holy-spirit", "link-our-beliefs-all": "/our-beliefs/", "beliefDescription": "We believe in the baptism in the Holy Spirit.", "referenceScripture": "Acts 2:4; Acts 1:8", "isCoreBelief": true, "_updatedDate": {"$date": "2026-04-14T18:02:11.000Z"}, "_createdDate": {"$date": "2024-09-18T20:10:00.000Z"}},
+        {"_id": "567cd8eb-31ad-4335-adfe-09bbccaa8293", "beliefTitle": "ON SALVATION", "link-our-beliefs-beliefTitle": "/our-beliefs/on-salvation", "link-our-beliefs-all": "/our-beliefs/", "beliefDescription": "We believe salvation is received through repentance toward God and faith in Jesus Christ.", "referenceScripture": "Ephesians 2:8-9; Romans 10:9-10", "isCoreBelief": true, "_updatedDate": {"$date": "2026-04-14T18:02:11.000Z"}, "_createdDate": {"$date": "2024-09-18T20:10:00.000Z"}},
+        {"_id": "d87ba8de-e7ce-49fa-bdac-9e1eccf9afce", "beliefTitle": "ON COMMUNION", "link-our-beliefs-beliefTitle": "/our-beliefs/on-communion", "link-our-beliefs-all": "/our-beliefs/", "beliefDescription": "We believe the Lord's Supper is an act of obedience and remembrance.", "referenceScripture": "1 Corinthians 11:23-26", "isCoreBelief": true, "_updatedDate": {"$date": "2026-04-14T18:02:11.000Z"}, "_createdDate": {"$date": "2024-09-18T20:10:00.000Z"}},
+        {"_id": "3a7236e1-5f57-4ab6-8c9e-f0a5ba4dab2c", "beliefTitle": "ON GOD", "link-our-beliefs-beliefTitle": "/our-beliefs/on-god", "link-our-beliefs-all": "/our-beliefs/", "beliefDescription": "We believe that God is the Creator of all things and the Author of life.", "referenceScripture": "Genesis 1:27; Isaiah 53:4", "isCoreBelief": true, "_updatedDate": {"$date": "2026-04-14T18:02:11.000Z"}, "_createdDate": {"$date": "2024-09-18T20:10:00.000Z"}}
+      ]
+    },
+    "Items": {
+      "displayName": "FCC VISION MAP",
+      "permissions": {"read": "ANYONE"},
+      "linkFields": {"item": "link-items-title", "list": "link-items-all"},
+      "titleField": "title",
+      "textFields": ["itemPageText"],
+      "total": 6,
+      "items": [
+        {"_id": "f3719a89-875a-45fb-ac49-63178d7f5458", "title": "LEADERSHIP LEGACY", "link-items-title": "/items/leadership-legacy", "link-items-all": "/vision/", "itemPageText": "Visionary expansion with spiritual depth. Education-backed ministry. Investing in people over programs.", "_updatedDate": {"$date": "2026-04-14T17:40:00.000Z"}, "_createdDate": {"$date": "2025-03-01T00:00:00.000Z"}},
+        {"_id": "d050d244-b380-4a58-880e-35149fa73e95", "title": "MINISTRY CYCLE & SEASONS OF DEVELOPMENT (2008-2025+)", "link-items-title": "/items/ministry-cycle", "link-items-all": "/vision/", "itemPageText": "2008-2010 Grounding and Orientation. 2010-2011 Team Development. 2014-2016 Infrastructure Advancement.", "_updatedDate": {"$date": "2026-04-14T17:40:00.000Z"}, "_createdDate": {"$date": "2025-03-01T00:00:00.000Z"}},
+        {"_id": "5c8a3ee2-8437-4f06-b78c-27bb956e5f2f", "title": "MOVING FORWARD", "link-items-title": "/items/moving-forward", "link-items-all": "/vision/", "itemPageText": "Vision: To be a Spirit-empowered, intergenerational church that transforms lives.", "_updatedDate": {"$date": "2026-04-14T17:40:00.000Z"}, "_createdDate": {"$date": "2025-03-01T00:00:00.000Z"}},
+        {"_id": "543c43b5-8c72-43ad-a0a3-f86b465e90c4", "title": "FCC Mission/Vision Summary", "link-items-title": "/items/fcc-mission%2Fvision-summary", "link-items-all": "/vision/", "itemPageText": "We are forming people whose lives are shaped by Christ, not just informed about Him.", "_updatedDate": {"$date": "2026-04-14T17:40:00.000Z"}, "_createdDate": {"$date": "2025-03-01T00:00:00.000Z"}},
+        {"_id": "012a5ee8-36f1-42e5-8d01-b707723ea9d6", "title": "STRATEGIC MINISTRY PILLARS", "link-items-title": "/items/strategic-ministry-pillars", "link-items-all": "/vision/", "itemPageText": "Discipleship and spiritual formation. Compassion and community impact. Next-gen leadership and family ministry.", "_updatedDate": {"$date": "2026-04-14T17:40:00.000Z"}, "_createdDate": {"$date": "2025-03-01T00:00:00.000Z"}},
+        {"_id": "00000000-0000-0000-0000-000000000003", "title": "FOUNDATIONAL IDENTITY", "link-items-title": "/items/foundational-identity", "link-items-all": "/vision/", "itemPageText": "Vision: To be a Spirit-empowered, intergenerational church that transforms lives, influences culture, and advances the Kingdom of God.", "_updatedDate": {"$date": "2026-04-14T17:40:00.000Z"}, "_createdDate": {"$date": "2025-03-01T00:00:00.000Z"}}
+      ]
+    },
+    "Jobs": {
+      "permissions": {"read": "ANYONE"},
+      "linkFields": {"item": "link-jobs-title", "list": "link-jobs-all"},
+      "titleField": "title",
+      "textFields": ["jobDescription", "aboutUs"],
+      "total": 0,
+      "items": []
+    },
+    "Services": {
+      "permissions": {"read": "ANYONE"},
+      "linkFields": {"item": "link-services-title", "list": "link-services-all"},
+      "titleField": "title",
+      "textFields": ["duration", "price"],
+      "total": 0,
+      "items": []
+    },
+    "@hanas535/events-calendar/events": {
+      "permissions": {"read": "ANYONE"},
+      "linkFields": {},
+      "titleField": "title",
+      "textFields": ["description"],
+      "total": 16,
+      "items": [
+        {"_id": "5d004a02-3891-4056-9151-c9c729374162", "title": "Pasta-Making Workshop", "description": "Demo record shipped with the calendar app.", "date": {"$date": "2025-09-13T21:00:00Z"}, "_updatedDate": {"$date": "2026-10-01T00:00:00.000Z"}},
+        {"_id": "62186e49-04c6-4669-9eb5-246d324a002f", "title": "Yoga by the River", "description": "Demo record shipped with the calendar app.", "date": {"$date": "2025-10-01T21:00:00Z"}, "_updatedDate": {"$date": "2026-10-01T00:00:00.000Z"}},
+        {"_id": "66cd3f90-2808-4bbb-b597-c2513b6c9e75", "title": "Urban Gardening Workshop", "description": "Demo record shipped with the calendar app.", "date": {"$date": "2025-09-11T21:00:00Z"}, "_updatedDate": {"$date": "2026-10-01T00:00:00.000Z"}},
+        {"_id": "d747c05a-8575-4406-8281-3a70fa1d92d4", "title": "Farmers Market", "description": "Demo record shipped with the calendar app.", "date": {"$date": "2025-07-15T21:00:00Z"}, "_updatedDate": {"$date": "2026-10-01T00:00:00.000Z"}}
+      ]
+    }
+  }
+}
