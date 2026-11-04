@@ -16,7 +16,7 @@ node src/index.mjs --dry-run               # live site: one request at a time, 4
 
 Options: `--out <dir>` (artifacts), `--state <file>` (previous run; default `<out>/state.json`), `--allow-drift` (accept a big change in page count), `--depth <n>` (link-crawl depth, default 2), `--quiet`.
 
-Artifacts in `out/<run>/`: `index-<version>.json` (the index), `manifest.json` (the pointer the panel will revalidate), `documents.json` (full internal records with evidence), `report.json` and `REPORT.md` (the reconciliation report), `state.json` (ETags, content hashes, strikes; written only after a complete, valid run) or `state.rejected.json`.
+Artifacts in `out/<run>/`: `index-<version>.json` (the index), `manifest.json` (the pointer the panel will revalidate), `documents.json` (full internal records with evidence), `report.json` and `REPORT.md` (the reconciliation report), `run.json` (the publication gate: `publishable` is true only when the content run is complete **and** the index validates; a passing validation on an incomplete run is not publishable), `state.json` (ETags, content hashes, strikes; written only after a publishable run) or `state.rejected.json`. The process exits 0 only for a publishable run.
 
 ### What the API key adds
 

@@ -132,6 +132,28 @@ test("an incomplete source (CMS pagination gap) makes the run incomplete and rem
   assert.equal(res.newState, null, "state is not advanced by an incomplete run");
 });
 
+test("publication gate: a valid index from an incomplete run is not publishable; a complete valid run is", async () => {
+  const first = await baseline();
+  assert.equal(first.publishable, true);
+  const res = await baseline((sc, cms) => { cms.collections.Items.total = 40; /* 6 of 40 returned */ }, {}, { state: first.newState });
+  assert.equal(res.validation.ok, true, "the carried index still validates");
+  assert.equal(res.rec.complete, false);
+  assert.equal(res.publishable, false, "generated files and passing validation are not enough");
+  assert.equal(res.newState, null);
+});
+
+test("fetch gate: a first run that loses more than 10% of the listed pages is not publishable even with no previous index", async () => {
+  const api = cloneApi();
+  const all = fullSitePages(api._raw.sc, api._raw.cms);
+  const keep = Object.fromEntries(Object.entries(all).filter(([p]) => !/^\/(alpha|bonita|books|care-ministry|christmas|connect|creatives|discipleship|easter|eurasia|giving|kids)$/.test(p)));
+  const client = siteClient({ pages: keep });
+  const res = await run({ client, api });
+  assert.equal(res.rec.complete, false);
+  assert.ok(res.rec.reasons.some((r) => /fetch gate/.test(r)), res.rec.reasons.join("; "));
+  assert.equal(res.publishable, false);
+  assert.ok(res.mapping.excluded.filter((e) => e.reason === "listed-but-404-conflict").length >= 12);
+});
+
 test("a network error during the crawl makes the run incomplete", async () => {
   const first = await baseline();
   const res = await baseline(undefined, { fail: ["/giving"] }, { state: first.newState });
@@ -148,7 +170,8 @@ test("drift gate: a run that finds far fewer pages keeps the previous index", as
   const res = await run({ client, api, state: first.newState });
   assert.equal(res.rec.complete, false);
   assert.equal(res.rec.docs.length, first.rec.docs.length, "the previous documents are carried forward");
-  assert.ok(res.rec.reasons.some((r) => /drift gate/.test(r)));
+  assert.ok(res.rec.reasons.some((r) => /drift gate|fetch gate/.test(r)), "either gate may trip first; both refuse the run: " + res.rec.reasons.join("; "));
+  assert.equal(res.publishable, false);
   assert.equal(res.newState, null, "state does not advance, so the next run starts from the last good index");
 });
 
