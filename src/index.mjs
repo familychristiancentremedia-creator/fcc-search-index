@@ -41,25 +41,36 @@ export async function runPipeline({ client, api, state = {}, out, allowDrift = f
   // 4. mapping
   const mapping = finalize({ candidates, pages, cms, siteContext }); mapping.boilerplate = boilerplate;
   // 5. reconciliation
-  const complete = sitemap.complete && (siteContext ? siteContext.complete : true) && (cms ? cms.complete : true) && client.stats.errors === 0;
+  // Completeness: every source answered, no fetch errors, and the listed pages mostly fetched (a crawl that loses
+  // more than 10% of the pages the sources list is incomplete even before the drift gate against a previous index).
+  const listed = [...candidates.values()].filter((c) => c.source !== "link-crawl" && c.source !== "previous-index");
+  const listedOk = listed.filter((c) => pages.get(c.path)?.status === 200).length;
+  const fetchOk = listed.length === 0 || listedOk >= POLICY.fetchFloor * listed.length;
+  const complete = sitemap.complete && (siteContext ? siteContext.complete : true) && (cms ? cms.complete : true) && client.stats.errors === 0 && fetchOk;
   const rec = reconcile({ prevDocs, docs: mapping.docs, pages, complete, strikes: state.strikes || {}, allowDrift });
+  if (!fetchOk) rec.reasons.unshift(`fetch gate: only ${listedOk} of ${listed.length} listed pages returned 200 (floor ${Math.round(POLICY.fetchFloor * 100)}%)`);
   // 6. build + validate
   const built = buildIndex(rec.docs);
   const validation = validateIndex(built, { prevCount: prevDocs.length || null, allowDrift });
   const finishedAt = new Date().toISOString();
   const { report, markdown } = buildReport({ runId, startedAt, finishedAt, mode, discovery, candidates, pages, mapping, rec, validation, manifest: built.manifest, published: false, client });
-  const newState = validation.ok && rec.complete ? { index: { version: built.version, docs: rec.docs }, pages: pageStateFrom(pages), strikes: rec.strikes, updatedAt: finishedAt } : null;
+  // The publication gate (planning package, section 7): a run may replace the live index only when the
+  // content run is complete (every source answered, no drift, no fetch errors) AND the index validates.
+  // Generated files or a passing validation alone are never enough.
+  const publishable = validation.ok && rec.complete;
+  const newState = publishable ? { index: { version: built.version, docs: rec.docs }, pages: pageStateFrom(pages), strikes: rec.strikes, updatedAt: finishedAt } : null;
   if (out) {
     mkdirSync(out, { recursive: true });
     writeFileSync(join(out, built.fileName), built.body);
     writeFileSync(join(out, "manifest.json"), JSON.stringify(built.manifest, null, 2));
+    writeFileSync(join(out, "run.json"), JSON.stringify({ runId, publishable, complete: rec.complete, valid: validation.ok, reasons: [...rec.reasons, ...validation.errors], version: built.version, file: built.fileName, finishedAt }, null, 2));
     writeFileSync(join(out, "report.json"), JSON.stringify(report, null, 2));
     writeFileSync(join(out, "REPORT.md"), markdown);
     writeFileSync(join(out, "documents.json"), JSON.stringify(rec.docs, null, 1));
     if (newState) writeFileSync(join(out, "state.json"), JSON.stringify(newState));
     else writeFileSync(join(out, "state.rejected.json"), JSON.stringify({ reason: validation.errors.concat(rec.reasons), at: finishedAt }));
   }
-  return { built, validation, report, markdown, rec, mapping, pages, discovery, candidates, newState };
+  return { built, validation, report, markdown, rec, mapping, pages, discovery, candidates, newState, publishable };
 }
 
 function arg(name, def) { const i = process.argv.indexOf(name); return i > -1 ? (process.argv[i + 1] && !process.argv[i + 1].startsWith("--") ? process.argv[i + 1] : true) : def; }
@@ -90,6 +101,7 @@ if (isMain) {
   }
   const result = await runPipeline({ client, api, state, out, allowDrift: process.argv.includes("--allow-drift"), depth: Number(arg("--depth", POLICY.crawlDepth)), mode: fixtures ? "fixtures" : "dry-run (live, no publish)", log });
   console.log(result.markdown);
-  console.log(`\nindex: ${join(out, result.built.fileName)} (${result.built.manifest.sizeBytes} bytes, ${result.built.manifest.count} documents); validation ${result.validation.ok ? "OK" : "FAILED"}; run ${result.rec.complete ? "complete" : "incomplete"}`);
-  process.exit(result.validation.ok ? 0 : 1);
+  console.log(`\nindex: ${join(out, result.built.fileName)} (${result.built.manifest.sizeBytes} bytes, ${result.built.manifest.count} documents); validation ${result.validation.ok ? "OK" : "FAILED"}; run ${result.rec.complete ? "complete" : "incomplete"}; publishable: ${result.publishable ? "yes" : "NO"}`);
+  // exit 0 only for a publishable run, so a workflow or a person can gate on the exit code as well as on run.json
+  process.exit(result.publishable ? 0 : 1);
 }
