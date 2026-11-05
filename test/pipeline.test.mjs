@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { runPipeline } from "../src/index.mjs";
 import { siteClient, fullSitePages, cloneApi } from "./helpers.mjs";
+import { NOT_FOUND_BODY } from "../src/lib/http.mjs";
 
 const quiet = { log: () => {} };
 const run = (opts) => runPipeline({ ...quiet, ...opts });
@@ -173,6 +174,19 @@ test("fetch gate: a first run that loses more than 10% of the listed pages is no
   assert.ok(res.rec.reasons.some((r) => /fetch gate/.test(r)), res.rec.reasons.join("; "));
   assert.equal(res.publishable, false);
   assert.ok(res.mapping.excluded.filter((e) => e.reason === "listed-but-404-conflict").length >= 12);
+});
+
+test("fetch gate: listed pages that answer 200 with Wix's 404 page (soft 404) count as lost, so the run is not publishable", async () => {
+  const api = cloneApi();
+  const lost = ["/alpha", "/bonita", "/books", "/care-ministry", "/christmas", "/connect", "/creatives", "/discipleship", "/easter", "/eurasia", "/giving", "/kids"];
+  const overrides = Object.fromEntries(lost.map((p) => [p, { body: NOT_FOUND_BODY }]));
+  const client = siteClient({ pages: fullSitePages(api._raw.sc, api._raw.cms, overrides) });
+  const res = await run({ client, api });
+  for (const p of lost) assert.equal(res.pages.get(p)?.status, 200, `${p} answered 200`);
+  assert.equal(res.rec.complete, false);
+  assert.ok(res.rec.reasons.some((r) => /fetch gate/.test(r)), res.rec.reasons.join("; "));
+  assert.equal(res.publishable, false, "a crawl of soft 404s must not replace a usable index");
+  assert.equal(res.newState, null);
 });
 
 test("a network error during the crawl makes the run incomplete", async () => {
