@@ -69,6 +69,20 @@ test("sitemap-only mode (no API key): same URLs, url-based identities, /vision f
   assert.equal(excluded(res, "/jobs").reason, "empty-list-page");
 });
 
+test("a content page discovered only by link crawling is included as an orphan", async () => {
+  const api = cloneApi();
+  const pages = fullSitePages(api._raw.sc, api._raw.cms, {
+    "/kids": { title: "FCC Kids", text: "A page with enough public content to be included in the search index.", links: ["/hidden-page"] },
+    "/hidden-page": { title: "Hidden page", text: "This linked public page has enough content to be included in search results." }
+  });
+  const client = siteClient({ pages });
+  const res = await run({ client, api: null });
+  const orphan = byPath(res, "/hidden-page");
+  assert.ok(orphan, "the fetched link-crawl page becomes an index document");
+  assert.equal(orphan.kind, "orphan");
+  assert.equal(orphan.source, "link-crawl");
+});
+
 test("a new CMS item with a published page becomes a new document on the next run", async () => {
   const first = await baseline();
   const state = first.newState;
@@ -133,6 +147,18 @@ test("a listed item page that returns 404 is an unresolved mapping, not a silent
   const res = await baseline(undefined, { missing: ["/our-beliefs/on-communion"] });
   assert.equal(excluded(res, "/our-beliefs/on-communion").reason, "listed-but-404-conflict");
   assert.equal(res.report.counts.unresolvedMappings, 1);
+});
+
+test("incomplete Site Context pagination blocks publication", async () => {
+  const api = cloneApi();
+  const listDynamicItemPages = api.listDynamicItemPages.bind(api);
+  api.listDynamicItemPages = async (prefix, pageId) => ({ ...await listDynamicItemPages(prefix, pageId), complete: pageId !== "j129y" });
+  const client = siteClient({ pages: fullSitePages(api._raw.sc, api._raw.cms) });
+  const res = await run({ client, api });
+  assert.equal(res.discovery.siteContext.complete, false);
+  assert.equal(res.rec.complete, false);
+  assert.equal(res.publishable, false);
+  assert.equal(res.newState, null);
 });
 
 test("duplicate URL (redirect to a known page) is consolidated", async () => {

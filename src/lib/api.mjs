@@ -21,25 +21,33 @@ export function createApi({ apiKey, siteId, fetchImpl = fetch, log = () => {} })
   return {
     kind: "live",
     async listStaticPages() {
-      const items = []; let cursor; let published;
+      const items = []; let cursor; let published; let complete = true;
       for (let i = 0; i < 20; i++) {
         const body = { paging: { limit: 100, ...(cursor ? { cursor } : {}) } };
         const r = await post("https://www.wixapis.com/ricos/v1/site-context/static-pages/list", body);
         published = r.published; items.push(...(r.items || []));
-        cursor = r.pagingMetadata?.cursors?.next; if (!r.pagingMetadata?.hasNext || !cursor) break;
+        const hasNext = !!r.pagingMetadata?.hasNext;
+        cursor = r.pagingMetadata?.cursors?.next;
+        if (!hasNext) break;
+        if (!cursor) { complete = false; break; }
+        if (i === 19) complete = false;
       }
-      return { published, items };
+      return { published, items, complete };
     },
     async listDynamicPages() { const r = await post("https://www.wixapis.com/ricos/v1/site-context/dynamic-pages/list", {}); return { published: r.published, items: r.items || [] }; },
     async listDynamicItemPages(prefix, pageId) {
-      const items = []; let cursor; let published;
+      const items = []; let cursor; let published; let complete = true;
       for (let i = 0; i < 40; i++) {
         const body = { prefix, pageId, paging: { limit: 50, ...(cursor ? { cursor } : {}) } };
         const r = await post("https://www.wixapis.com/ricos/v1/site-context/dynamic-item-pages/list", body);
         published = r.published; items.push(...(r.items || []));
-        cursor = r.pagingMetadata?.cursors?.next; if (!r.pagingMetadata?.hasNext || !cursor) break;
+        const hasNext = !!r.pagingMetadata?.hasNext;
+        cursor = r.pagingMetadata?.cursors?.next;
+        if (!hasNext) break;
+        if (!cursor) { complete = false; break; }
+        if (i === 39) complete = false;
       }
-      return { published, items };
+      return { published, items, complete };
     },
     async queryItems(collectionId) {
       const items = []; let offset = 0; let total = null;

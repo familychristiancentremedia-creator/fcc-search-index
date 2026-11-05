@@ -46,11 +46,11 @@ function normalizeLink(l) { try { const p = new URL(l, SITE.origin).pathname.rep
 // Phase B: after fetching. Produces documents and exclusions.
 export function finalize({ candidates, pages, cms, siteContext, policy = POLICY }) {
   const docs = []; const excluded = []; const notes = [];
+  // Promote pages discovered by the link crawl before iterating candidates so they
+  // pass through the same mapping and policy checks as explicitly listed pages.
+  for (const [path, page] of pages) if (!candidates.has(path) && page.level > 0) candidates.set(path, { path, kind: "orphan", source: "link-crawl", evidence: ["link-crawl"] });
   const itemPageCount = {};
   for (const cand of candidates.values()) if (cand.kind === "item" && cand.collection) itemPageCount[cand.collection] = (itemPageCount[cand.collection] || 0) + 1;
-
-  // orphan pages discovered only by the link crawl
-  for (const [path, page] of pages) if (!candidates.has(path) && page.level > 0) candidates.set(path, { path, kind: "orphan", source: "link-crawl", evidence: ["link-crawl"] });
 
   for (const cand of candidates.values()) {
     const page = pages.get(cand.path);
