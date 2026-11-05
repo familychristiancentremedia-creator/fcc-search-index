@@ -30,6 +30,8 @@ jobs:
         env:
           WIX_API_KEY: ${{ secrets.WIX_API_KEY }}
           WIX_SITE_ID: ${{ secrets.WIX_SITE_ID }}
+          # Set to "1" only once the key carries "Read Site Context for Rich Content" (see README).
+          WIX_SITE_CONTEXT: "0"
         run: node src/index.mjs --dry-run --out out/dry-run
 
       - name: Upload the report

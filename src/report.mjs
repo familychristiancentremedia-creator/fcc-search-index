@@ -13,7 +13,7 @@ export function buildReport({ runId, startedAt, finishedAt, mode, discovery, can
     runId, startedAt, finishedAt, mode, complete: rec.complete, reasons: rec.reasons,
     sources: {
       sitemap: { complete: !!discovery.sitemap?.complete, urls: discovery.sitemap?.urls.length || 0, subSitemaps: discovery.sitemap?.subs || [], errors: discovery.sitemap?.errors || [] },
-      siteContext: discovery.siteContext ? { complete: discovery.siteContext.complete, staticPages: discovery.siteContext.statics.length, dynamicTemplates: discovery.siteContext.dynamicPages.length, itemPages: Object.values(discovery.siteContext.itemPages).reduce((a, b) => a + b.length, 0), errors: discovery.siteContext.errors } : "unavailable (no API key)",
+      siteContext: discovery.siteContext ? { complete: discovery.siteContext.complete, staticPages: discovery.siteContext.statics.length, dynamicTemplates: discovery.siteContext.dynamicPages.length, itemPages: Object.values(discovery.siteContext.itemPages).reduce((a, b) => a + b.length, 0), errors: discovery.siteContext.errors } : discovery.siteContextOff ? "off (WIX_SITE_CONTEXT is not 1)" : "unavailable (no API key)",
       cms: cms ? { complete: cms.complete, collections: collectionsDiscovered, records: recordsPerSource, errors: cms.errors } : "unavailable (no API key)",
       linkCrawl: { discovered: fetched.filter((p) => p.level > 0).length }
     },
@@ -57,8 +57,8 @@ function toMarkdown(r, mapping, rec) {
     `| Unresolved mappings | ${c.unresolvedMappings} |`,
     `| Duplicates consolidated | ${c.duplicatesConsolidated} |`, "");
   lines.push("## Sources", "", `- Sitemap: ${r.sources.sitemap.complete ? "complete" : "INCOMPLETE"}${r.sources.sitemap.errors.length ? " (" + r.sources.sitemap.errors.join("; ") + ")" : ""}`,
-    `- Site Context API: ${typeof r.sources.siteContext === "string" ? r.sources.siteContext : `${r.sources.siteContext.complete ? "complete" : "INCOMPLETE"}: ${r.sources.siteContext.staticPages} static pages, ${r.sources.siteContext.dynamicTemplates} dynamic templates, ${r.sources.siteContext.itemPages} item pages`}`,
-    `- CMS: ${typeof r.sources.cms === "string" ? r.sources.cms : `${r.sources.cms.complete ? "complete" : "INCOMPLETE"}: ${Object.entries(r.sources.cms.records).map(([k, v]) => `${k} ${v}`).join(", ")}`}`, "");
+    `- Site Context API: ${typeof r.sources.siteContext === "string" ? r.sources.siteContext : `${r.sources.siteContext.complete ? "complete" : "INCOMPLETE"}: ${r.sources.siteContext.staticPages} static pages, ${r.sources.siteContext.dynamicTemplates} dynamic templates, ${r.sources.siteContext.itemPages} item pages${r.sources.siteContext.errors.length ? " (" + r.sources.siteContext.errors.join("; ") + ")" : ""}`}`,
+    `- CMS: ${typeof r.sources.cms === "string" ? r.sources.cms : `${r.sources.cms.complete ? "complete" : "INCOMPLETE"}: ${Object.entries(r.sources.cms.records).map(([k, v]) => `${k} ${v}`).join(", ")}${r.sources.cms.errors.length ? " (" + r.sources.cms.errors.join("; ") + ")" : ""}`}`, "");
   if (mapping.excluded.length) { lines.push("## Exclusions", ""); for (const e of mapping.excluded) lines.push(`- ${e.path || e.recordId}: ${e.reason}${e.collection ? ` (${e.collection})` : ""}${e.chars != null ? ` (${e.chars} chars)` : ""}${e.to ? ` -> ${e.to}` : ""}`); lines.push(""); }
   if (r.validation.warnings?.length) { lines.push("## Validation warnings (for review)", ""); for (const w of r.validation.warnings) lines.push(`- ${w}`); lines.push(""); }
   if (rec.changes.new.length || rec.changes.removed.length || rec.changes.moved.length || rec.changes.updated.length) {
