@@ -47,6 +47,20 @@ test("sitemap-only mode (no API key): same URLs, url-based identities, /vision f
   assert.equal(excluded(res, "/jobs").reason, "empty-list-page");
 });
 
+test("a content page discovered only by link crawling is included as an orphan", async () => {
+  const api = cloneApi();
+  const pages = fullSitePages(api._raw.sc, api._raw.cms, {
+    "/kids": { title: "FCC Kids", text: "A page with enough public content to be included in the search index.", links: ["/hidden-page"] },
+    "/hidden-page": { title: "Hidden page", text: "This linked public page has enough content to be included in search results." }
+  });
+  const client = siteClient({ pages });
+  const res = await run({ client, api: null });
+  const orphan = byPath(res, "/hidden-page");
+  assert.ok(orphan, "the fetched link-crawl page becomes an index document");
+  assert.equal(orphan.kind, "orphan");
+  assert.equal(orphan.source, "link-crawl");
+});
+
 test("a new CMS item with a published page becomes a new document on the next run", async () => {
   const first = await baseline();
   const state = first.newState;
