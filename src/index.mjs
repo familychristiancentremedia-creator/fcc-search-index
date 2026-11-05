@@ -44,11 +44,14 @@ export async function runPipeline({ client, api, state = {}, out, allowDrift = f
   // Completeness: every source answered, no fetch errors, and the listed pages mostly fetched (a crawl that loses
   // more than 10% of the pages the sources list is incomplete even before the drift gate against a previous index).
   const listed = [...candidates.values()].filter((c) => c.source !== "link-crawl" && c.source !== "previous-index");
-  const listedOk = listed.filter((c) => pages.get(c.path)?.status === 200).length;
+  // A listed page counts as fetched only when it answered 200 with a real page. Wix can answer a missing page
+  // with 200 and its own "404 Error: Page Not Found" page (a soft 404); that page is lost, not fetched.
+  const fetched = (p) => !!p && p.status === 200 && !p.isNotFound;
+  const listedOk = listed.filter((c) => fetched(pages.get(c.path))).length;
   const fetchOk = listed.length === 0 || listedOk >= POLICY.fetchFloor * listed.length;
   const complete = sitemap.complete && (siteContext ? siteContext.complete : true) && (cms ? cms.complete : true) && client.stats.errors === 0 && fetchOk;
   const rec = reconcile({ prevDocs, docs: mapping.docs, pages, complete, strikes: state.strikes || {}, allowDrift });
-  if (!fetchOk) rec.reasons.unshift(`fetch gate: only ${listedOk} of ${listed.length} listed pages returned 200 (floor ${Math.round(POLICY.fetchFloor * 100)}%)`);
+  if (!fetchOk) rec.reasons.unshift(`fetch gate: only ${listedOk} of ${listed.length} listed pages returned a real page (200, not Wix's 404 page; floor ${Math.round(POLICY.fetchFloor * 100)}%)`);
   // 6. build + validate
   const built = buildIndex(rec.docs);
   const validation = validateIndex(built, { prevCount: prevDocs.length || null, allowDrift });

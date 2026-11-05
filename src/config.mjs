@@ -33,7 +33,7 @@ export const POLICY = {
   boilerplateMinPages: 5,
   removalStrikes: 2,                 // complete runs a missing page must fail before removal
   driftFloor: 0.8,                   // a run with fewer than this share of the previous doc count is incomplete
-  fetchFloor: 0.9,                   // a run in which fewer than this share of the listed (sitemap/Site Context) pages return 200 is incomplete
+  fetchFloor: 0.9,                   // a run in which fewer than this share of the listed (sitemap/Site Context) pages return a real page (200, not a soft 404) is incomplete
   excerptChars: 1500,
   maxTokens: 400,
   sizeBudgetBytes: 300 * 1024,

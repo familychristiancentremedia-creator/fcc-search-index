@@ -9,7 +9,7 @@ Automated full-site search index for **familychristiancentre.org**, feeding the 
 Node 22 or newer (developed on 24). No dependencies, no headless browser.
 
 ```bash
-npm test                                   # 25 unit and pipeline tests on recorded fixtures (offline)
+npm test                                   # 28 unit and pipeline tests on recorded fixtures (offline)
 node src/index.mjs --from-fixtures fixtures  # offline smoke run on the recorded sitemap, API responses and 8 recorded pages
 node src/index.mjs --dry-run               # live site: one request at a time, 400 ms apart, conditional GETs; writes out/dry-run/
 ```
@@ -35,10 +35,10 @@ the Site Context API lists static pages, dynamic templates and the **published i
 1. `discover.mjs`: sitemap index and sub-sitemaps; Site Context lists; CMS items (reports an incomplete run on any pagination gap).
 2. `map.mjs`: candidates from all sources, authority order Site Context item pages > CMS link fields > sitemap > link crawl; never builds a URL from a title. After fetching: 404 and Wix-404-page detection, redirect consolidation, policy rules, stable identities, listing-page attachment for records without pages.
 3. `extract.mjs`: conditional GET with the previous ETag (Wix answers 304), parse of the server-rendered HTML (`#PAGES_CONTAINER` text, title, description, headings, links), link crawl, boilerplate removal (blocks on more than 60% of pages).
-4. `reconcile.mjs`: incomplete runs remove nothing; a page is removed only after two consecutive complete runs in which it is dead; a run that shrinks below 80% of the previous count is incomplete.
+4. `reconcile.mjs`: incomplete runs remove nothing; a page is removed only after two consecutive complete runs in which it is dead; a run that shrinks below 80% of the previous count is incomplete. Before that, the fetch gate in `index.mjs` makes a run incomplete when fewer than 90% of the pages the sources list come back as real pages; a page that answers 200 with Wix's own "404 Error: Page Not Found" page (a soft 404) counts as lost, not fetched.
 5. `build.mjs`: versioned index + manifest; validation (schema, identities, excluded collections, stray e-mail addresses, size budget, drift).
 6. `report.mjs`: the reconciliation counts and changes, as JSON and Markdown.
 
 ## Fixtures
 
-`fixtures/sitemap/` is the site's sitemap on 4 November 2026; `fixtures/api/` the Site Context and CMS responses (read-only recordings); `fixtures/html/` nine recorded pages including a 404. Tests build synthetic pages for the rest of the site from those recordings and mutate them per scenario (new item, renamed slug, removed item, record without a page, listed-but-404, redirect duplicate, pagination gap, network error, drift gate, ETag cache, content change, policy switch).
+`fixtures/sitemap/` is the site's sitemap on 4 November 2026; `fixtures/api/` the Site Context and CMS responses (read-only recordings); `fixtures/html/` nine recorded pages including a 404. Tests build synthetic pages for the rest of the site from those recordings and mutate them per scenario (new item, renamed slug, removed item, record without a page, listed-but-404, soft 404, redirect duplicate, pagination gap, network error, drift gate, ETag cache, content change, policy switch).
