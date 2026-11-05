@@ -42,13 +42,17 @@ export async function discoverSiteContext(api) {
   if (!api) return null;
   const out = { complete: false, statics: [], dynamicPages: [], itemPages: {}, published: null, errors: [] };
   try {
+    let complete = true;
     const s = await api.listStaticPages(); out.published = s.published; out.statics = (s.items || []).map((p) => ({ id: p.id, title: p.title?.trim(), path: normalizePath(p.path) }));
+    if (s.complete === false) complete = false;
     const d = await api.listDynamicPages(); out.dynamicPages = (d.items || []).map((p) => ({ id: p.id, title: p.title, path: normalizePath(p.path), hasItemPages: !!p.hasItemPages }));
+    if (d.complete === false) complete = false;
     for (const t of out.dynamicPages.filter((p) => p.hasItemPages)) {
       const r = await api.listDynamicItemPages(t.path, t.id);
       out.itemPages[t.id] = (r.items || []).map((p) => ({ id: p.id, title: p.title, path: normalizePath(p.path), recordId: recordIdFromItemPageId(p.id), published: r.published !== false }));
+      if (r.complete === false) complete = false;
     }
-    out.complete = true;
+    out.complete = complete;
   } catch (e) { out.errors.push(`site context: ${e.message || e}`); }
   return out;
 }

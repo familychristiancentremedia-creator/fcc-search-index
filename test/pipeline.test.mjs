@@ -127,6 +127,18 @@ test("a listed item page that returns 404 is an unresolved mapping, not a silent
   assert.equal(res.report.counts.unresolvedMappings, 1);
 });
 
+test("incomplete Site Context pagination blocks publication", async () => {
+  const api = cloneApi();
+  const listDynamicItemPages = api.listDynamicItemPages.bind(api);
+  api.listDynamicItemPages = async (prefix, pageId) => ({ ...await listDynamicItemPages(prefix, pageId), complete: pageId !== "j129y" });
+  const client = siteClient({ pages: fullSitePages(api._raw.sc, api._raw.cms) });
+  const res = await run({ client, api });
+  assert.equal(res.discovery.siteContext.complete, false);
+  assert.equal(res.rec.complete, false);
+  assert.equal(res.publishable, false);
+  assert.equal(res.newState, null);
+});
+
 test("duplicate URL (redirect to a known page) is consolidated", async () => {
   const api = cloneApi();
   const pages = fullSitePages(api._raw.sc, api._raw.cms, { "/old-kids": { title: "Old", text: "x" } });

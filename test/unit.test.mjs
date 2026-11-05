@@ -7,6 +7,7 @@ import { parseSitemapIndex, parseUrlset, normalizePath, recordIdFromItemPageId }
 import { buildIndex, validateIndex } from "../src/build.mjs";
 import { reconcile } from "../src/reconcile.mjs";
 import { cleanTitle } from "../src/map.mjs";
+import { createApi } from "../src/lib/api.mjs";
 import { FIX, syntheticPage } from "./helpers.mjs";
 
 const html = (name) => readFileSync(join(FIX, "html", name), "utf8");
@@ -55,6 +56,23 @@ test("item page ids carry the CMS record id", () => {
   assert.equal(recordIdFromItemPageId("our-beliefs/{beliefTitle}_3a7236e1-5f57-4ab6-8c9e-f0a5ba4dab2c"), "3a7236e1-5f57-4ab6-8c9e-f0a5ba4dab2c");
   assert.equal(recordIdFromItemPageId("items/{title}_00000000-0000-0000-0000-000000000003"), "00000000-0000-0000-0000-000000000003");
   assert.equal(recordIdFromItemPageId("nonsense"), null);
+});
+
+test("Site Context pagination caps report incomplete results", async () => {
+  const api = createApi({
+    apiKey: "test-key",
+    siteId: "test-site",
+    fetchImpl: async () => ({
+      ok: true,
+      async text() {
+        return JSON.stringify({ published: true, items: [], pagingMetadata: { hasNext: true, cursors: { next: "next-page" } } });
+      }
+    })
+  });
+  const statics = await api.listStaticPages();
+  const itemPages = await api.listDynamicItemPages("/items", "template");
+  assert.equal(statics.complete, false);
+  assert.equal(itemPages.complete, false);
 });
 
 test("tokens, entities, titles", () => {
