@@ -20,13 +20,17 @@ Artifacts in `out/<run>/`: `index-<version>.json` (the index), `manifest.json` (
 
 ### What the API key adds
 
-Without `WIX_API_KEY` the run uses the public sitemap, the server-rendered HTML and a two-level internal link crawl. That already covers every public page on the site today (72 sitemap URLs plus the noindexed `/vision` page), with URL-based identities. With a **read-only** API key:
+Without `WIX_API_KEY` the run uses the public sitemap, the server-rendered HTML and a two-level internal link crawl. That already covers every public page on the site today (72 sitemap URLs plus the noindexed `/vision` page), with URL-based identities. With an API key:
 
 ```bash
 WIX_API_KEY=...   WIX_SITE_ID=8c234506-96ea-4329-a68e-98184058db48   node src/index.mjs --dry-run
 ```
 
-the Site Context API lists static pages, dynamic templates and the **published item pages** (the authoritative CMS-record-to-URL map), identities become `page:<id>` and `cms:<collection>:<itemId>` (stable across slug changes), and CMS records are cross-checked, so a record without a published page can be attached to its listing page or reported, and a listed page that 404s is flagged as an unresolved mapping. The key needs only "Read Data Items" and "Read Site Context for Rich Content", with site access limited to this site. Never commit it; GitHub Actions secrets hold it in phase 3.
+CMS records are read and cross-checked: item pages get the identity `cms:<collection>:<itemId>` (stable across slug changes), a record without a published page can be attached to its listing page or reported, and a listed page that 404s is flagged as an unresolved mapping. This needs the Data Items read scope ("Read Data Items"; in the API-key screen the box is **Wix Data**, which Wix only offers as read-and-manage).
+
+The Site Context API is a second, **opt-in** source (`WIX_SITE_CONTEXT=1`). It lists static pages, dynamic templates and the published item pages (the authoritative record-to-URL map), and static pages then get the identity `page:<id>` instead of `url:<hash>`. It needs the scope "Read Site Context for Rich Content" (`SCOPE.DC-RICOS.READ-SITE-CONTEXT`); on 5 November 2026 no box in the API-key screen was found to carry it (**Ricos Documents** does not), so live runs leave it off. The switch is deliberate: the source is either on and required for a complete run, or off and never consulted, so a key that sometimes can and sometimes can't answer never flips static-page identities between runs.
+
+Never commit the key; GitHub Actions secrets hold it (`WIX_API_KEY`, `WIX_SITE_ID`), and the manual **Dry run** workflow reads them.
 
 ## How it works
 

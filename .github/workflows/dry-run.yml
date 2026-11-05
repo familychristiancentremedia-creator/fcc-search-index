@@ -1,0 +1,47 @@
+# Manual dry run of the search indexer against the live site. Nothing is published.
+# Run it from the Actions tab (workflow_dispatch). It uses the repository secrets
+# WIX_API_KEY and WIX_SITE_ID when they exist; without them the run is sitemap + HTML only.
+# The report artifact says which sources answered (sitemap, Site Context, CMS) and why
+# a run is or isn't publishable. It never contains the key.
+name: Dry run
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Unit tests (fixtures only, no network)
+        run: npm test
+
+      - name: Dry run against the live site
+        id: run
+        env:
+          WIX_API_KEY: ${{ secrets.WIX_API_KEY }}
+          WIX_SITE_ID: ${{ secrets.WIX_SITE_ID }}
+          # Set to "1" only once the key carries "Read Site Context for Rich Content" (see README).
+          WIX_SITE_CONTEXT: "0"
+        run: node src/index.mjs --dry-run --out out/dry-run
+
+      - name: Upload the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-run-report-${{ github.run_number }}
+          path: |
+            out/dry-run/REPORT.md
+            out/dry-run/report.json
+            out/dry-run/run.json
+          if-no-files-found: warn
+          retention-days: 14

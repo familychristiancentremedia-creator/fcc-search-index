@@ -37,6 +37,27 @@ test("stable identities: items are keyed by collection + record id, statics by p
   assert.equal(byPath(res, "/items/fcc-mission%2Fvision-summary").docId, "cms:Items:543c43b5-8c72-43ad-a0a3-f86b465e90c4", "encoded-slash slug is used verbatim");
 });
 
+test("Site Context off (key without the scope): CMS still cross-checked, run complete, url-based static identities", async () => {
+  const res = await baseline(undefined, {}, { useSiteContext: false });
+  assert.equal(res.discovery.siteContext, null, "the source is never consulted");
+  assert.ok(res.rec.complete); assert.ok(res.validation.ok, res.validation.errors.join("; "));
+  assert.equal(res.rec.docs.length, 71, "same documents as the full run");
+  assert.equal(res.rec.docs.filter((d) => d.kind === "item").length, 15);
+  assert.equal(byPath(res, "/our-beliefs/on-god").docId, "cms:OurBeliefs:3a7236e1-5f57-4ab6-8c9e-f0a5ba4dab2c", "item identities still come from the CMS");
+  assert.match(byPath(res, "/kids").docId, /^url:[0-9a-f]{40}$/, "static pages fall back to url identities");
+  assert.equal(res.report.sources.siteContext, "off (WIX_SITE_CONTEXT is not 1)");
+});
+
+test("Site Context on but failing: the run is incomplete, identities are not flipped silently", async () => {
+  const api = cloneApi();
+  api.listStaticPages = async () => { throw new Error("https://www.wixapis.com/ricos/v1/site-context/static-pages/list -> 403: missing scope"); };
+  const client = siteClient({ pages: fullSitePages(api._raw.sc, api._raw.cms) });
+  const res = await run({ client, api });
+  assert.equal(res.discovery.siteContext.complete, false);
+  assert.ok(!res.rec.complete); assert.ok(!res.publishable);
+  assert.match(res.discovery.siteContext.errors[0], /403/);
+});
+
 test("sitemap-only mode (no API key): same URLs, url-based identities, /vision found by the link crawl", async () => {
   const api = cloneApi();
   const client = siteClient({ pages: fullSitePages(api._raw.sc, api._raw.cms) });

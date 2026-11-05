@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Pipeline orchestrator and CLI. Phase 1 never publishes: artifacts go to --out only.
-//   node src/index.mjs --dry-run                 live site, sitemap + HTML (+ APIs if WIX_API_KEY/WIX_SITE_ID are set)
+//   node src/index.mjs --dry-run                 live site, sitemap + HTML (+ CMS if WIX_API_KEY/WIX_SITE_ID are set,
+//                                                + Site Context if WIX_SITE_CONTEXT=1 as well)
 //   node src/index.mjs --from-fixtures fixtures  offline, recorded sitemap, API responses and HTML
 //   options: --out <dir> (default out) --state <file> (default <out>/state.json) --allow-drift --depth <n> --quiet
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
@@ -21,14 +22,17 @@ export const FIXTURE_PAGE_FILES = {
   "/connect": "connect.html", "/upcomingevents": "upcomingevents.html", "/items/leadership-legacy": "leadership-legacy.html"
 };
 
-export async function runPipeline({ client, api, state = {}, out, allowDrift = false, depth = POLICY.crawlDepth, mode = "dry-run", log = () => {}, sitemapClient } = {}) {
+export async function runPipeline({ client, api, state = {}, out, allowDrift = false, depth = POLICY.crawlDepth, mode = "dry-run", log = () => {}, sitemapClient, useSiteContext = true } = {}) {
   const startedAt = new Date().toISOString();
   const runId = startedAt.replace(/[-:]/g, "").slice(0, 15);
   // 1. discovery
   const sitemap = await discoverSitemap(sitemapClient || client);
-  const siteContext = await discoverSiteContext(api);
+  // Site Context is opt-in (useSiteContext). The API key must carry the "Read Site Context for Rich Content" scope;
+  // a key without it would fail here on every run. The source is either on, and then required for a complete run,
+  // or off, and then never consulted, so a flaky answer can never flip static-page identities (page:<id> vs url:<hash>).
+  const siteContext = useSiteContext ? await discoverSiteContext(api) : null;
   const cms = await discoverCms(api);
-  const discovery = { sitemap, siteContext, cms };
+  const discovery = { sitemap, siteContext, cms, siteContextOff: !useSiteContext };
   log(`discovery: sitemap ${sitemap.urls.length} urls (${sitemap.complete ? "complete" : "INCOMPLETE"}); site context ${siteContext ? (siteContext.complete ? "ok" : "FAILED") : "n/a"}; cms ${cms ? (cms.complete ? "ok" : "FAILED") : "n/a"}`);
   // 2. candidates (+ every previously indexed URL, so removals are decided on a real fetch)
   const candidates = buildCandidates(discovery);
@@ -88,6 +92,7 @@ if (isMain) {
   const quiet = process.argv.includes("--quiet");
   const log = quiet ? () => {} : (m) => console.error(m);
   const state = existsSync(statePath) ? JSON.parse(readFileSync(statePath, "utf8")) : {};
+  const useSiteContext = process.env.WIX_SITE_CONTEXT === "1"; // live runs: off unless the key has the scope
   let client, api;
   if (fixtures) {
     const dir = resolve(fixtures);
@@ -101,8 +106,9 @@ if (isMain) {
     client = createClient({ userAgent: SITE.userAgent, delayMs: SITE.delayMs, log });
     api = createApi({ apiKey: process.env.WIX_API_KEY, siteId: process.env.WIX_SITE_ID || SITE.siteId });
     if (!process.env.WIX_API_KEY) log("WIX_API_KEY not set: running from the public sitemap and HTML only (Site Context and CMS sources unavailable)");
+    else if (!useSiteContext) log("WIX_SITE_CONTEXT not set to 1: Site Context source off (CMS on); static pages keep url-based identities");
   }
-  const result = await runPipeline({ client, api, state, out, allowDrift: process.argv.includes("--allow-drift"), depth: Number(arg("--depth", POLICY.crawlDepth)), mode: fixtures ? "fixtures" : "dry-run (live, no publish)", log });
+  const result = await runPipeline({ client, api, state, out, allowDrift: process.argv.includes("--allow-drift"), depth: Number(arg("--depth", POLICY.crawlDepth)), mode: fixtures ? "fixtures" : "dry-run (live, no publish)", log, useSiteContext: fixtures ? true : useSiteContext });
   console.log(result.markdown);
   console.log(`\nindex: ${join(out, result.built.fileName)} (${result.built.manifest.sizeBytes} bytes, ${result.built.manifest.count} documents); validation ${result.validation.ok ? "OK" : "FAILED"}; run ${result.rec.complete ? "complete" : "incomplete"}; publishable: ${result.publishable ? "yes" : "NO"}`);
   // exit 0 only for a publishable run, so a workflow or a person can gate on the exit code as well as on run.json
